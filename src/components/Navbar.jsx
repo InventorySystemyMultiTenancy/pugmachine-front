@@ -27,17 +27,16 @@ export function Navbar() {
           <div className="flex items-center">
             <Link
               to="/"
-              className="flex items-center space-x-2 sm:space-x-3 group"
+              className="flex flex-col items-center group"
             >
               <img
                 src={logoPug}
                 alt="PugMachine"
-                className="w-20 h-20 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-transform duration-300 group-hover:scale-110"
+                className="w-16 h-16 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-transform duration-300 group-hover:scale-110"
               />
-              <span className="text-2xl font-serif font-bold text-gradient bg-gradient-to-r from-primary via-accent-yellow to-primary bg-clip-text" style={{ textShadow: 'none' }}>
+              <span className="text-xs font-bold text-black leading-none mt-0.5" style={{ textShadow: 'none' }}>
                 PugMachine
               </span>
-            
             </Link>
 
             {/* Menu Desktop */}
