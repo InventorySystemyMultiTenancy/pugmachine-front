@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-const SENHA_ACESSO = "clubekids2025"; // Defina a senha de acesso aqui
+const SENHA_ACESSO = "pugmachine2025"; // Defina a senha de acesso aqui
 
 export function Registrar() {
   const [senhaAcesso, setSenhaAcesso] = useState("");
