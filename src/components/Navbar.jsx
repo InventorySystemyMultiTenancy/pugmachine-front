@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useState } from "react";
+import logoPug from "../assets/logopugsemfundo.png";
 
 export function Navbar() {
   const { usuario, logout } = useAuth();
@@ -20,7 +21,7 @@ export function Navbar() {
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="shadow-2xl border-b-4 border-amber-700" style={{ background: 'linear-gradient(to right, #3D1A0F, #8B5E3C)', textShadow: '0 2px 4px rgba(0,0,0,0.5)', color: '#FFFFFF' }}>
+    <nav className="shadow-2xl border-b-4 border-amber-700" style={{ background: 'linear-gradient(to right, #8B5E3C, #3D1A0F)', textShadow: '0 2px 4px rgba(0,0,0,0.5)', color: '#FFFFFF' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center">
@@ -29,12 +30,9 @@ export function Navbar() {
               className="flex items-center space-x-2 sm:space-x-3 group"
             >
               <img
-                src="/pugmachinelogo.png"
+                src={logoPug}
                 alt="PugMachine"
-                className="w-16 h-16 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full border-2 border-white/50 object-cover shadow-sm transition-transform duration-300 group-hover:scale-110"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
+                className="w-16 h-16 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-transform duration-300 group-hover:scale-110"
               />
             
             </Link>

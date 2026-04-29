@@ -1,3 +1,5 @@
+import pugLoading from "../assets/puganimacaoloading1.png";
+
 export function LoadingSpinner({ size = "md", message = "Carregando..." }) {
   const sizeClasses = {
     sm: "w-8 h-8",
@@ -13,7 +15,7 @@ export function LoadingSpinner({ size = "md", message = "Carregando..." }) {
 
         {/* Inner decoration */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-2xl animate-bounce">🧸</div>
+          <img src={pugLoading} alt="Carregando" className="w-8 h-8 object-contain animate-bounce" />
         </div>
       </div>
 
@@ -31,7 +33,7 @@ export function PageLoader() {
         <div className="relative inline-block mb-6">
           <div className="w-20 h-20 spinner border-4"></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-3xl animate-bounce">🧸</div>
+            <img src={pugLoading} alt="Carregando" className="w-10 h-10 object-contain animate-bounce" />
           </div>
         </div>
         <h2 className="text-2xl font-bold mb-2">
