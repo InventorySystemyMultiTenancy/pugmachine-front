@@ -39,7 +39,7 @@ export function Login() {
             <img
               src="/pugmachinelogo.png"
               alt="PugMachine"
-              className="w-38 h-38 object-contain"
+              className="w-38 h-38 object-cover rounded-full border-2 border-primary/40 bg-white p-1 shadow-md"
             />
           </div>
           <h1 className="text-4xl font-bold mb-2">

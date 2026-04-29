@@ -9,7 +9,7 @@ export function Footer() {
               <img
                 src="/pugmachinelogo.png"
                 alt="PugMachine"
-                className="w-20 h-20 object-contain"
+                className="w-20 h-20 object-cover rounded-full border-2 border-white/70 bg-white/90 p-1 shadow-md"
               />
               <span className="text-xl font-bold text-gradient bg-gradient-to-r from-primary via-accent-yellow to-primary bg-clip-text" style={{ textShadow: 'none' }}>
                 PugMachine

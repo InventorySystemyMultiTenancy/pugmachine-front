@@ -31,7 +31,7 @@ export function Navbar() {
               <img
                 src="/pugmachinelogo.png"
                 alt="PugMachine"
-                className="w-20 h-25 sm:w-20 sm:h-20 lg:w-28 lg:h-28 object-contain transition-transform duration-300 group-hover:scale-110"
+                className="w-20 h-20 sm:w-20 sm:h-20 lg:w-28 lg:h-28 object-cover rounded-full border-2 border-white/70 bg-white/90 p-1 shadow-md transition-transform duration-300 group-hover:scale-110"
                 onError={(e) => {
                   e.target.style.display = "none";
                 }}
