@@ -6,7 +6,6 @@ import { Footer } from "../components/Footer";
 import { PageHeader, AlertBox, Badge } from "../components/UIComponents";
 import { PageLoader, EmptyState } from "../components/Loading";
 import { useAuth } from "../contexts/AuthContext";
-import Swal from "sweetalert2";
 
 export function Roteiros() {
   const { usuario } = useAuth();
@@ -24,8 +23,6 @@ export function Roteiros() {
   const [roteiroSelecionadoParaAdicionar, setRoteiroSelecionadoParaAdicionar] = useState(null);
   const [filtroLoja, setFiltroLoja] = useState("");
   const [observacoesEditando, setObservacoesEditando] = useState({});
-  const [isGerandoRoteiros, setIsGerandoRoteiros] = useState(false);
-  const [deletingRoteiroId, setDeletingRoteiroId] = useState(null);
 
   useEffect(() => {
     carregarRoteiros();
@@ -66,87 +63,6 @@ export function Roteiros() {
     }
   };
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
-  const showToast = (icon, title) => {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon,
-      title,
-      showConfirmButton: false,
-      timer: 2500,
-      timerProgressBar: true,
-    });
-  };
-
-  const gerarRoteiros = async () => {
-    if (isGerandoRoteiros) return;
-
-    try {
-      setIsGerandoRoteiros(true);
-      setError("");
-
-      const response = await api.post(
-        "/roteiros/gerar",
-        { usarTemplate: false },
-        { headers: getAuthHeaders() }
-      );
-
-      const message = response?.data?.message || "Roteiros gerados com sucesso!";
-      showToast("success", message);
-      await carregarRoteiros();
-    } catch (error) {
-      const apiMessage = error.response?.data?.message || error.response?.data?.error || error.message;
-      const normalized = String(apiMessage || "").toLowerCase();
-
-      if (normalized.includes("já existem")) {
-        showToast("info", apiMessage || "Os roteiros de hoje já existem.");
-        await carregarRoteiros();
-        return;
-      }
-
-      showToast("error", apiMessage || "Erro ao gerar roteiros.");
-    } finally {
-      setIsGerandoRoteiros(false);
-    }
-  };
-
-  const excluirRoteiro = async (roteiro) => {
-    if (!roteiro?.id || deletingRoteiroId) return;
-
-    const confirmacao = await Swal.fire({
-      title: "Excluir roteiro?",
-      text: `Tem certeza que deseja excluir o roteiro \"${roteiro.zona || roteiro.nome}\"?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Sim, excluir",
-      cancelButtonText: "Cancelar",
-      confirmButtonColor: "#dc2626",
-    });
-
-    if (!confirmacao.isConfirmed) return;
-
-    try {
-      setDeletingRoteiroId(roteiro.id);
-      setError("");
-
-      const response = await api.delete(`/roteiros/${roteiro.id}/excluir`, {
-        headers: getAuthHeaders(),
-      });
-
-      showToast("success", response?.data?.message || "Roteiro excluído com sucesso!");
-      await carregarRoteiros();
-    } catch (error) {
-      const apiMessage = error.response?.data?.message || error.response?.data?.error || error.message;
-      showToast("error", apiMessage || "Erro ao excluir roteiro.");
-    } finally {
-      setDeletingRoteiroId(null);
-    }
-  };
 
   const iniciarRoteiro = async (roteiroId) => {
     try {
@@ -371,14 +287,7 @@ export function Roteiros() {
 
         {/* Botão para gerenciar roteiros (apenas admin) */}
         {usuario?.role === "ADMIN" && (
-          <div className="mb-6 flex flex-wrap gap-3">
-            <button
-              onClick={gerarRoteiros}
-              disabled={isGerandoRoteiros}
-              className={`btn-primary ${isGerandoRoteiros ? "opacity-60 cursor-not-allowed" : ""}`}
-            >
-              {isGerandoRoteiros ? "⏳ Gerando..." : "🧩 Gerar Roteiros"}
-            </button>
+          <div className="mb-6">
             <button
               onClick={() => navigate("/roteiros/gerenciar")}
               className="btn-secondary"
@@ -430,21 +339,12 @@ export function Roteiros() {
                     </Badge>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => continuarRoteiro(meuRoteiro.id)}
-                    className="btn-success"
-                  >
-                    ▶️ Continuar Roteiro
-                  </button>
-                  <button
-                    onClick={() => excluirRoteiro(meuRoteiro)}
-                    disabled={deletingRoteiroId === meuRoteiro.id}
-                    className={`px-4 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors ${deletingRoteiroId === meuRoteiro.id ? "opacity-60 cursor-not-allowed" : ""}`}
-                  >
-                    {deletingRoteiroId === meuRoteiro.id ? "Excluindo..." : "🗑️ Excluir Roteiro"}
-                  </button>
-                </div>
+                <button
+                  onClick={() => continuarRoteiro(meuRoteiro.id)}
+                  className="btn-success"
+                >
+                  ▶️ Continuar Roteiro
+                </button>
               </div>
             </div>
           </div>
@@ -608,13 +508,6 @@ export function Roteiros() {
                       >
                         🚀 Iniciar Roteiro
                       </button>
-                      <button
-                        onClick={() => excluirRoteiro(roteiro)}
-                        disabled={deletingRoteiroId === roteiro.id}
-                        className={`w-full px-4 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors ${deletingRoteiroId === roteiro.id ? "opacity-60 cursor-not-allowed" : ""}`}
-                      >
-                        {deletingRoteiroId === roteiro.id ? "Excluindo..." : "🗑️ Excluir Roteiro"}
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -659,16 +552,7 @@ export function Roteiros() {
                     </div>
                   )}
                   
-                  <div className="space-y-2">
-                    <Badge type="warning">Em Andamento</Badge>
-                    <button
-                      onClick={() => excluirRoteiro(roteiro)}
-                      disabled={deletingRoteiroId === roteiro.id}
-                      className={`w-full px-4 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors ${deletingRoteiroId === roteiro.id ? "opacity-60 cursor-not-allowed" : ""}`}
-                    >
-                      {deletingRoteiroId === roteiro.id ? "Excluindo..." : "🗑️ Excluir Roteiro"}
-                    </button>
-                  </div>
+                  <Badge type="warning">Em Andamento</Badge>
                 </div>
               ))}
             </div>
@@ -708,16 +592,7 @@ export function Roteiros() {
                     </div>
                   )}
                   
-                  <div className="space-y-2">
-                    <Badge type="success">✓ Concluído</Badge>
-                    <button
-                      onClick={() => excluirRoteiro(roteiro)}
-                      disabled={deletingRoteiroId === roteiro.id}
-                      className={`w-full px-4 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors ${deletingRoteiroId === roteiro.id ? "opacity-60 cursor-not-allowed" : ""}`}
-                    >
-                      {deletingRoteiroId === roteiro.id ? "Excluindo..." : "🗑️ Excluir Roteiro"}
-                    </button>
-                  </div>
+                  <Badge type="success">✓ Concluído</Badge>
                 </div>
               ))}
             </div>

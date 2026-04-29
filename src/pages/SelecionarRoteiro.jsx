@@ -6,6 +6,7 @@ import { Footer } from "../components/Footer";
 import { PageHeader, AlertBox, Badge } from "../components/UIComponents";
 import { PageLoader, EmptyState } from "../components/Loading";
 import { useAuth } from "../contexts/AuthContext";
+import Swal from "sweetalert2";
 
 
 export function SelecionarRoteiro() {
@@ -77,6 +78,8 @@ export function SelecionarRoteiro() {
   const [observacoesEditando, setObservacoesEditando] = useState({});
   const [alertasRoteiro, setAlertasRoteiro] = useState([]);
   const [loadingAlertas, setLoadingAlertas] = useState(false);
+  const [isGerandoRoteiros, setIsGerandoRoteiros] = useState(false);
+  const [deletingRoteiroId, setDeletingRoteiroId] = useState(null);
 
 
   useEffect(() => {
@@ -179,6 +182,88 @@ export function SelecionarRoteiro() {
       setTodasLojas(response.data || []);
     } catch (error) {
       console.error("Erro ao carregar lojas:", error);
+    }
+  };
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const showToast = (icon, title) => {
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon,
+      title,
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+    });
+  };
+
+  const gerarRoteiros = async () => {
+    if (isGerandoRoteiros) return;
+
+    try {
+      setIsGerandoRoteiros(true);
+      setError("");
+
+      const response = await api.post(
+        "/roteiros/gerar",
+        { usarTemplate: false },
+        { headers: getAuthHeaders() }
+      );
+
+      const message = response?.data?.message || "Roteiros gerados com sucesso!";
+      showToast("success", message);
+      await carregarRoteiros();
+    } catch (error) {
+      const apiMessage = error.response?.data?.message || error.response?.data?.error || error.message;
+      const normalized = String(apiMessage || "").toLowerCase();
+
+      if (normalized.includes("já existem")) {
+        showToast("info", apiMessage || "Os roteiros de hoje já existem.");
+        await carregarRoteiros();
+        return;
+      }
+
+      showToast("error", apiMessage || "Erro ao gerar roteiros.");
+    } finally {
+      setIsGerandoRoteiros(false);
+    }
+  };
+
+  const excluirRoteiro = async (roteiro) => {
+    if (!roteiro?.id || deletingRoteiroId) return;
+
+    const confirmacao = await Swal.fire({
+      title: "Excluir roteiro?",
+      text: `Tem certeza que deseja excluir o roteiro \"${roteiro.zona || roteiro.nome}\"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#dc2626",
+    });
+
+    if (!confirmacao.isConfirmed) return;
+
+    try {
+      setDeletingRoteiroId(roteiro.id);
+      setError("");
+
+      const response = await api.delete(`/roteiros/${roteiro.id}/excluir`, {
+        headers: getAuthHeaders(),
+      });
+
+      showToast("success", response?.data?.message || "Roteiro excluído com sucesso!");
+      await carregarRoteiros();
+    } catch (error) {
+      const apiMessage = error.response?.data?.message || error.response?.data?.error || error.message;
+      showToast("error", apiMessage || "Erro ao excluir roteiro.");
+    } finally {
+      setDeletingRoteiroId(null);
     }
   };
 
@@ -439,6 +524,15 @@ export function SelecionarRoteiro() {
             icon="🗺️"
           />
           <div className="flex items-center gap-2 mt-2 md:mt-0">
+            {isAdmin && (
+              <button
+                className={`px-4 py-2 rounded-lg font-semibold border-2 transition-colors ${isGerandoRoteiros ? "bg-gray-300 text-gray-600 border-gray-400 cursor-not-allowed" : "bg-green-600 text-white border-green-700 hover:bg-green-700"}`}
+                onClick={gerarRoteiros}
+                disabled={isGerandoRoteiros}
+              >
+                {isGerandoRoteiros ? "⏳ Gerando..." : "🧩 Gerar Roteiros"}
+              </button>
+            )}
             <button
               className={`px-4 py-2 rounded-lg font-semibold border-2 transition-colors ${filtroTipoRoteiro === "bolinha" ? "bg-blue-500 text-white border-blue-700" : "bg-white text-blue-700 border-blue-300 hover:bg-blue-100"}`}
               onClick={() => setFiltroTipoRoteiro("bolinha")}
@@ -770,6 +864,16 @@ export function SelecionarRoteiro() {
                       </button>
                     )}
                     <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        excluirRoteiro(roteiro);
+                      }}
+                      disabled={deletingRoteiroId === roteiro.id}
+                      className={`w-full px-4 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors ${deletingRoteiroId === roteiro.id ? "opacity-60 cursor-not-allowed" : ""}`}
+                    >
+                      {deletingRoteiroId === roteiro.id ? "Excluindo..." : "🗑️ Excluir Roteiro"}
+                    </button>
+                    <button
                       className="btn-primary w-full"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -966,6 +1070,13 @@ export function SelecionarRoteiro() {
                         ⬅️ Desfazer Finalização
                       </button>
                     )}
+                    <button
+                      onClick={() => excluirRoteiro(roteiro)}
+                      disabled={deletingRoteiroId === roteiro.id}
+                      className={`w-full mt-2 px-4 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors ${deletingRoteiroId === roteiro.id ? "opacity-60 cursor-not-allowed" : ""}`}
+                    >
+                      {deletingRoteiroId === roteiro.id ? "Excluindo..." : "🗑️ Excluir Roteiro"}
+                    </button>
                   </div>
                 );
               })}
