@@ -23,7 +23,7 @@ export function Navbar() {
   return (
     <nav className="shadow-2xl border-b-4 border-amber-700" style={{ background: 'linear-gradient(to right, #8B5E3C, #3D1A0F)', textShadow: '0 2px 4px rgba(0,0,0,0.5)', color: '#FFFFFF' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-24">
           <div className="flex items-center">
             <Link
               to="/"
@@ -32,7 +32,8 @@ export function Navbar() {
               <img
                 src={logoPug}
                 alt="PugMachine"
-                className="w-25 h-25 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-transform duration-300 group-hover:scale-110"
+                className="w-24 h-24 object-contain transition-transform duration-300 group-hover:scale-110"
+                style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.7))' }}
               />
             </Link>
 
