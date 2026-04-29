@@ -32,8 +32,11 @@ export function Navbar() {
               <img
                 src={logoPug}
                 alt="PugMachine"
-                className="w-16 h-16 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-transform duration-300 group-hover:scale-110"
+                className="w-20 h-20 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain transition-transform duration-300 group-hover:scale-110"
               />
+              <span className="text-2xl font-serif font-bold text-gradient bg-gradient-to-r from-primary via-accent-yellow to-primary bg-clip-text" style={{ textShadow: 'none' }}>
+                PugMachine
+              </span>
             
             </Link>
 
